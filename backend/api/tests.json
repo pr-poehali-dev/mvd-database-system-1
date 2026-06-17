@@ -1,0 +1,22 @@
+{
+  "tests": [
+    {
+      "name": "Получить список дел",
+      "method": "GET",
+      "path": "/?table=cases",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Получить настройки",
+      "method": "GET",
+      "path": "/?table=settings",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Неизвестная таблица",
+      "method": "GET",
+      "path": "/?table=hacker",
+      "expectedStatus": 400
+    }
+  ]
+}
