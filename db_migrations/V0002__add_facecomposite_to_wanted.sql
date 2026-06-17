@@ -1,0 +1,1 @@
+ALTER TABLE wanted ADD COLUMN IF NOT EXISTS facecomposite TEXT;

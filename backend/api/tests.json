@@ -17,6 +17,19 @@
       "method": "GET",
       "path": "/?table=hacker",
       "expectedStatus": 400
+    },
+    {
+      "name": "Поиск по базе",
+      "method": "GET",
+      "path": "/?action=search&q=test",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Авторизация с неверными данными",
+      "method": "POST",
+      "path": "/?action=auth",
+      "body": {"login": "nope", "password": "nope"},
+      "expectedStatus": 401
     }
   ]
 }

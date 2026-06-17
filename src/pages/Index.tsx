@@ -8,12 +8,17 @@ import WantedTab from '@/components/mvd/WantedTab';
 import ReportsTab from '@/components/mvd/ReportsTab';
 import CitizensTab from '@/components/mvd/CitizensTab';
 import SettingsTab from '@/components/mvd/SettingsTab';
+import LoginScreen from '@/components/mvd/LoginScreen';
+import SearchTab from '@/components/mvd/SearchTab';
+import FaceComposer from '@/components/mvd/FaceComposer';
 
 const TABS = [
   { id: 'cases', label: 'Дела', icon: 'FolderOpen' },
+  { id: 'search', label: 'Поиск', icon: 'Search' },
+  { id: 'wanted', label: 'Розыск', icon: 'UserSearch' },
+  { id: 'face', label: 'Фоторобот', icon: 'ScanFace' },
   { id: 'officers', label: 'Сотрудники', icon: 'Users' },
   { id: 'mail', label: 'Почта', icon: 'Mail' },
-  { id: 'wanted', label: 'Розыск', icon: 'UserSearch' },
   { id: 'reports', label: 'Отчёты', icon: 'FileBarChart' },
   { id: 'citizens', label: 'Личные дела', icon: 'IdCard' },
   { id: 'settings', label: 'Настройки', icon: 'Settings' },
@@ -24,12 +29,23 @@ const DEFAULT_LOGO = 'https://cdn.poehali.dev/projects/4f49b569-8141-4d0e-a49b-b
 interface SettingsRow { department_name: string; region: string; logo_url: string }
 
 const Index = () => {
+  const [officer, setOfficer] = useState<api.Officer | null>(() => {
+    const saved = localStorage.getItem('mvd_officer');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [tab, setTab] = useState<string>('cases');
   const [settings, setSettings] = useState<SettingsRow | null>(null);
 
   useEffect(() => {
-    api.list<SettingsRow>('settings').then((r) => r[0] && setSettings(r[0]));
-  }, []);
+    if (officer) api.list<SettingsRow>('settings').then((r) => r[0] && setSettings(r[0]));
+  }, [officer]);
+
+  const logout = () => {
+    localStorage.removeItem('mvd_officer');
+    setOfficer(null);
+  };
+
+  if (!officer) return <LoginScreen onLogin={setOfficer} />;
 
   return (
     <div className="min-h-screen bg-background">
@@ -44,9 +60,15 @@ const Index = () => {
               Единая информационная система · {settings?.region || 'Центральный регион'}
             </p>
           </div>
-          <div className="ml-auto flex items-center gap-2 text-sm text-primary-foreground/70">
-            <Icon name="ShieldCheck" size={18} />
-            <span>Защищённый доступ</span>
+          <div className="ml-auto flex items-center gap-4">
+            <div className="text-right">
+              <div className="font-500">{officer.full_name}</div>
+              <div className="text-xs text-primary-foreground/60">{officer.rank || officer.position || 'Сотрудник'}</div>
+            </div>
+            <button onClick={logout} className="flex items-center gap-2 border border-primary-foreground/30 px-3 py-2 text-sm transition hover:bg-primary-foreground/10">
+              <Icon name="LogOut" size={16} />
+              Выход
+            </button>
           </div>
         </div>
       </header>
@@ -72,9 +94,11 @@ const Index = () => {
 
       <main className="container py-8">
         {tab === 'cases' && <CasesTab />}
+        {tab === 'search' && <SearchTab />}
+        {tab === 'wanted' && <WantedTab />}
+        {tab === 'face' && <FaceComposer onSaved={() => setTab('wanted')} />}
         {tab === 'officers' && <OfficersTab />}
         {tab === 'mail' && <MailTab />}
-        {tab === 'wanted' && <WantedTab />}
         {tab === 'reports' && <ReportsTab />}
         {tab === 'citizens' && <CitizensTab />}
         {tab === 'settings' && <SettingsTab />}
