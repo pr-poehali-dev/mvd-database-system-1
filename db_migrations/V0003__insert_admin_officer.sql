@@ -1,0 +1,1 @@
+INSERT INTO officers (full_name, rank, position, login, password, email) VALUES ('Администратор', 'Генерал', 'Системный администратор', 'admin', 'admin123', 'admin@mvd.ru');
